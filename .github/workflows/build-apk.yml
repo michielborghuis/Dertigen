@@ -26,11 +26,10 @@ jobs:
       - name: Packages installeren
         run: flutter pub get
 
-      - name: Generate launcher icons
+      - name: Launcher icon genereren
         run: |
-          dart pub global activate flutter_launcher_icons
           flutter pub get
-          dart pub global run flutter_launcher_icons
+          dart run flutter_launcher_icons
 
       - name: APK bouwen
         run: flutter build apk --release
