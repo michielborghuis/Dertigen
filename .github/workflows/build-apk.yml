@@ -1,0 +1,43 @@
+name: Bouw Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main", "master"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Project ophalen
+        uses: actions/checkout@v4
+
+      - name: Flutter installeren
+        run: |
+          git clone https://github.com/flutter/flutter.git --depth 1 --branch stable "$HOME/flutter"
+          echo "$HOME/flutter/bin" >> "$GITHUB_PATH"
+
+      - name: Android-projectbestanden aanmaken
+        run: |
+          flutter config --no-analytics
+          flutter create --platforms=android --org nl.michielborghuis --project-name dertigen_teller .
+
+      - name: Packages installeren
+        run: flutter pub get
+
+      - name: Generate launcher icons
+        run: |
+          dart pub global activate flutter_launcher_icons
+          flutter pub get
+          dart pub global run flutter_launcher_icons
+
+      - name: APK bouwen
+        run: flutter build apk --release
+
+      - name: APK beschikbaar maken
+        uses: actions/upload-artifact@v4
+        with:
+          name: Dertigen-Teller-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
